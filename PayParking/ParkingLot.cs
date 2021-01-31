@@ -6,7 +6,7 @@ namespace PayParking
 {
    public class ParkingLot
    {
-       public int TotalSpots { get; }
+       //public int TotalSpots { get; }
        public double FirstHourRate { get; }
        public double HourlyRate { get;  }
 
@@ -14,7 +14,10 @@ namespace PayParking
 
        public ParkingLot(int totalSpots, double firstHourRate, double hourlyRate)
        {
-           this.TotalSpots = totalSpots;
+           //this.TotalSpots = totalSpots;
+           // ToDo create # Parkign SLots _ momentan generez eu numere / locurile de parcare
+
+
            this.FirstHourRate = firstHourRate;
            this.HourlyRate = hourlyRate;
        }

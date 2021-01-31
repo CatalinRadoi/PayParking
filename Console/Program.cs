@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using PayParking;
 
 namespace Console
 {
     internal static class Program
     {
 
-        //private ParkingLot
+        private static ParkingLot parkingLot;
 
         static void Main(string[] args)
         {
+            parkingLot = new ParkingLot(10, 10, 5);
+
+
+
             bool showMenu = true;
             while (showMenu)
             {
@@ -48,17 +54,20 @@ namespace Console
         private static void ParkVehicle()
         {
             System.Console.Clear();
-            System.Console.WriteLine("Reverse String");
+            System.Console.WriteLine("Parking...cutare");
  
-            char[] charArray = GetLicenseNumber().ToCharArray();
-            Array.Reverse(charArray);
-            DisplayResult(String.Concat(charArray));
+
+            var vehicle = new Vehicle {LicenseNumber = GetLicenseNumber()};
+
+            parkingLot.ParkVehicle(vehicle);
+
+            //DisplayResult(String.Concat(charArray));
         }
  
         private static void FreeParkingSlot()
         {
             System.Console.Clear();
-            System.Console.WriteLine("Remove Whitespace");
+            System.Console.WriteLine("FreeParkingSlot");
  
             DisplayResult(GetLicenseNumber().Replace(" ", ""));
         }
