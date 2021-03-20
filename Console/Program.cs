@@ -12,8 +12,7 @@ namespace Console
         static void Main(string[] args)
         {
             parkingLot = new ParkingLot(10, 10, 5);
-
-
+            
 
             bool showMenu = true;
             while (showMenu)

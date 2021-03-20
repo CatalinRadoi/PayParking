@@ -6,7 +6,6 @@ namespace PayParking
 {
    public class ParkingLot
    {
-       //public int TotalSpots { get; }
        public double FirstHourRate { get; }
        public double HourlyRate { get;  }
 
@@ -14,8 +13,14 @@ namespace PayParking
 
        public ParkingLot(int totalSpots, double firstHourRate, double hourlyRate)
        {
-           //this.TotalSpots = totalSpots;
-           // ToDo create # Parkign SLots _ momentan generez eu numere / locurile de parcare
+           for (int i = 1; i <= totalSpots; i++)
+           {
+               this.ParkingSpots.Add(new ParkingSpot
+               {
+                   IsFree = true,
+                   Number = i.ToString()
+               });
+           }
 
 
            this.FirstHourRate = firstHourRate;
@@ -37,8 +42,7 @@ namespace PayParking
         {
             var spot = this.ParkingSpots.First(ps => ps.Vehicle == null);
             spot.Vehicle = vehicle;
-
-
+            spot.StartTime = DateTime.Now;
         }
 
         public void FreeParkingSpot(string licenseNumber)
@@ -47,6 +51,7 @@ namespace PayParking
                 ps.Vehicle.LicenseNumber.Equals(licenseNumber, StringComparison.InvariantCultureIgnoreCase));
 
             spot.Vehicle = null;
+            spot.EndTime = DateTime.Now;
         }
 
     }
