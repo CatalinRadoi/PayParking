@@ -97,7 +97,7 @@ namespace PayParking
 
         public string WelcomeMessage()
         {
-            return $"Welcome to NU-STIU Parking | {this.FirstHourRate}lei first hour, then {this.HourlyRate}lei hourly.";
+            return $"Welcome to DERO Parking | {this.FirstHourRate}lei first hour, then {this.HourlyRate}lei hourly.";
 
         }
 

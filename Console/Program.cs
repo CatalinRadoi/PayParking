@@ -21,19 +21,19 @@ namespace Console
                 var toPay = parkingLot.ToPay(licenseNumber, endDate);
                 var parkingSpot = parkingLot.GetParkingSpotByLicenseNumber(licenseNumber);
 
-                System.Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+                System.Console.WriteLine("-----------------------------------------------------------------");
                 System.Console.WriteLine("Start Date: " + parkingSpot.StartTime);
-                System.Console.Write("End Date: " + endDate);
+                System.Console.WriteLine("End Date: " + endDate);
                 System.Console.WriteLine($"Total payment: {toPay} lei");
-
-                System.Console.WriteLine("Press ENTER to pay...");
+                System.Console.WriteLine("-----------------------------------------------------------------");
+                System.Console.WriteLine("Press ENTER to scan Credit Card...");
                 System.Console.ReadLine();
                 parkingLot.FreeParkingSpot(licenseNumber);
             }
             else
             {
                 System.Console.WriteLine("No vehicle found. You need to work on those typing skills");
-                System.Console.WriteLine("Press ENTER (the biggest key) to return.............");
+                System.Console.WriteLine("Press ENTER (the largest key) to return to menu.............");
                 System.Console.ReadLine();
             }
         }
