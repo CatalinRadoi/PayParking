@@ -1,48 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
+using System.Text;
+using Microsoft.VisualBasic;
 
 namespace PayParking
 {
-   public class ParkingLot
-   {
-       public double FirstHourRate { get; }
-       public double HourlyRate { get;  }
+    public class ParkingLot
+    {
+        public ParkingLot(int totalSpots, double firstHourRate, double hourlyRate)
+        {
+            this.ParkingSpots = new List<ParkingSpot>();
+            for (var i = 1; i <= totalSpots; i++)
+            {
+                this.ParkingSpots.Add(new ParkingSpot
+                {
+                    Number = i.ToString()
+                });
+            }
+
+
+            this.FirstHourRate = firstHourRate;
+            this.HourlyRate = hourlyRate;
+        }
+
+        public double FirstHourRate { get; }
+        public double HourlyRate { get; }
 
         public List<ParkingSpot> ParkingSpots { get; set; }
-
-       public ParkingLot(int totalSpots, double firstHourRate, double hourlyRate)
-       {
-           for (int i = 1; i <= totalSpots; i++)
-           {
-               this.ParkingSpots.Add(new ParkingSpot
-               {
-                   IsFree = true,
-                   Number = i.ToString()
-               });
-           }
-
-
-           this.FirstHourRate = firstHourRate;
-           this.HourlyRate = hourlyRate;
-       }
-
-
-       public bool IsFull()
-       {
-           return this.CountAvailableSpots() == 0;
-       }
 
         public int CountAvailableSpots()
         {
             return this.ParkingSpots.Count(ps => ps.Vehicle == null);
-        }
-
-        public void ParkVehicle(Vehicle vehicle)
-        {
-            var spot = this.ParkingSpots.First(ps => ps.Vehicle == null);
-            spot.Vehicle = vehicle;
-            spot.StartTime = DateTime.Now;
         }
 
         public void FreeParkingSpot(string licenseNumber)
@@ -51,8 +41,75 @@ namespace PayParking
                 ps.Vehicle.LicenseNumber.Equals(licenseNumber, StringComparison.InvariantCultureIgnoreCase));
 
             spot.Vehicle = null;
-            spot.EndTime = DateTime.Now;
         }
 
+        public bool VehicleExists(string licenseNumber)
+        {
+            return this.ParkingSpots.Any(ps => ps.Vehicle != null &&
+                                               ps.Vehicle.LicenseNumber.Equals(licenseNumber,
+                                                   StringComparison.InvariantCultureIgnoreCase));
+
+        }
+
+        public string GetStatus()
+        {
+            var sb = new StringBuilder();
+            sb.Append("------------------------------------------------------------------------------");
+            sb.Append(Environment.NewLine);
+            foreach (var parkingSpot in this.ParkingSpots)
+            {
+                sb.Append($"Parking Spot {parkingSpot.Number}:");
+                sb.Append($"\t{(parkingSpot.Number == "10" ? string.Empty : "\t")}");
+                sb.Append(parkingSpot.IsFree ? "Empty" : parkingSpot.Vehicle.LicenseNumber.ToUpper());
+                sb.Append("\t");
+                if (!parkingSpot.IsFree)
+                {
+                    sb.Append(parkingSpot.StartTime.ToString("dd-MM-yyyy HH:mm:ss"));
+
+                    sb.Append("\t");
+                    sb.Append(this.ToPay(parkingSpot) + " lei");
+                }
+
+                sb.Append(Environment.NewLine);
+            }
+
+            sb.Append("------------------------------------------------------------------------------");
+            sb.Append(Environment.NewLine);
+            return sb.ToString();
+        }
+
+        public bool IsFull()
+        {
+            return this.CountAvailableSpots() == 0;
+        }
+
+        public bool IsEmpty()
+        {
+            return this.CountAvailableSpots() == this.ParkingSpots.Count;
+        }
+
+
+        public void ParkVehicle(Vehicle vehicle)
+        {
+            var spot = this.ParkingSpots.First(ps => ps.Vehicle == null);
+            spot.Vehicle = vehicle;
+            spot.StartTime = DateTime.Now;
+        }
+
+
+        public double ToPay(ParkingSpot parkingSpot)
+        {
+            var totalHours = (int) Math.Ceiling((DateTime.Now - parkingSpot.StartTime).TotalHours);
+
+            return this.FirstHourRate + (totalHours - 1) * this.HourlyRate;
+        }
+
+        public double ToPay(string licenseNumber)
+        {
+            var spot = this.ParkingSpots.First(ps => ps.Vehicle.LicenseNumber.Equals(licenseNumber, StringComparison.InvariantCultureIgnoreCase));
+            return this.ToPay(spot);
+        }
+
+    
     }
 }

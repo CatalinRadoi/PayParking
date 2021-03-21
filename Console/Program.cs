@@ -1,81 +1,121 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using PayParking;
+﻿using PayParking;
 
 namespace Console
 {
     internal static class Program
     {
-
         private static ParkingLot parkingLot;
 
-        static void Main(string[] args)
-        {
-            parkingLot = new ParkingLot(10, 10, 5);
-            
-
-            bool showMenu = true;
-            while (showMenu)
-            {
-                showMenu = MainMenu();
-            }
-        }
-        private static bool MainMenu()
+        private static void FreeParkingSlot()
         {
             System.Console.Clear();
-            System.Console.WriteLine("Choose an option:");
-            System.Console.WriteLine("1) Park Vehicle");
-            System.Console.WriteLine("2) Free Parking Spot");
-            System.Console.WriteLine("3) Exit");
-            System.Console.Write("\r\nSelect an option: ");
- 
-            switch (System.Console.ReadLine())
+            System.Console.WriteLine("Free Parking Slot");
+
+            var licenseNumber = GetLicenseNumber();
+            System.Console.WriteLine();
+            if (parkingLot.VehicleExists(licenseNumber))
             {
-                case "1":
-                    ParkVehicle();
-                    return true;
-                case "2":
-                    FreeParkingSlot();
-                    return true;
-                case "3":
-                    return false;
-                default:
-                    return true;
+                var toPay = parkingLot.ToPay(licenseNumber);
+                System.Console.WriteLine($"Total payment: {toPay} lei");
+                System.Console.WriteLine("Press ENTER to pay...");
+                System.Console.ReadLine();
+                parkingLot.FreeParkingSpot(licenseNumber);
+            }
+            else
+            {
+                System.Console.WriteLine("No vehicle found. You need to work on those typing skills");
+                System.Console.WriteLine("Press ENTER (the biggest key) to return.............");
+                System.Console.ReadLine();
             }
         }
- 
+
         private static string GetLicenseNumber()
         {
             System.Console.Write("License Number: ");
             return System.Console.ReadLine();
         }
- 
+
+        private static void Main()
+        {
+            parkingLot = new ParkingLot(10, 10, 5);
+
+            var showMenu = true;
+            while (showMenu)
+            {
+                showMenu = MainMenu();
+            }
+        }
+
+        private static bool MainMenu()
+        {
+            System.Console.Clear();
+            PrintStatus();
+            System.Console.WriteLine();
+            System.Console.WriteLine("Choose an option:");
+
+            if (!parkingLot.IsFull())
+            {
+                System.Console.WriteLine("1) Park Vehicle");
+            }
+
+            if (!parkingLot.IsEmpty())
+            {
+                System.Console.WriteLine("2) Free Parking Spot");
+            }
+
+            System.Console.WriteLine("0) Exit");
+            System.Console.Write("\r\nSelect an option: ");
+
+            switch (System.Console.ReadLine())
+            {
+                case "1":
+                    if (!parkingLot.IsFull())
+                    {
+                        ParkVehicle();
+                    }
+
+                    return true;
+                case "2":
+                    if (!parkingLot.IsEmpty())
+                    {
+                        FreeParkingSlot();
+                    }
+
+                    return true;
+                case "0":
+                    System.Console.Clear();
+                    System.Console.WriteLine("You can go outside and play now!");
+                    System.Console.Beep(); //ToDo nu stiu daca merge ca nu mai am driver de sunet pe laptop asta lol
+                    System.Threading.Thread.Sleep(3000);
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
         private static void ParkVehicle()
         {
             System.Console.Clear();
-            System.Console.WriteLine("Parking...cutare");
- 
+            System.Console.WriteLine("Park Vehicle");
+            var licenseNumber = GetLicenseNumber();
+            System.Console.WriteLine();
 
-            var vehicle = new Vehicle {LicenseNumber = GetLicenseNumber()};
+            if (!parkingLot.VehicleExists(licenseNumber))
+            {
+                var vehicle = new Vehicle {LicenseNumber = licenseNumber};
 
-            parkingLot.ParkVehicle(vehicle);
-
-            //DisplayResult(String.Concat(charArray));
+                parkingLot.ParkVehicle(vehicle);
+            }
+            else
+            {
+                   System.Console.WriteLine("Vehicle already parked! Did you have your coffee today?"); 
+                   System.Console.ReadLine();
+            }
         }
- 
-        private static void FreeParkingSlot()
+
+        private static void PrintStatus()
         {
-            System.Console.Clear();
-            System.Console.WriteLine("FreeParkingSlot");
- 
-            DisplayResult(GetLicenseNumber().Replace(" ", ""));
-        }
- 
-        private static void DisplayResult(string message)
-        {
-            System.Console.WriteLine($"\r\nYour modified string is: {message}");
-            System.Console.Write("\r\nPress Enter to return to Main Menu");
-            System.Console.ReadLine();
+            System.Console.Write(parkingLot.GetStatus());
         }
     }
 }
