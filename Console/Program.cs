@@ -1,4 +1,5 @@
-﻿using PayParking;
+﻿using System;
+using PayParking;
 
 namespace Console
 {
@@ -12,11 +13,19 @@ namespace Console
             System.Console.WriteLine("Free Parking Slot");
 
             var licenseNumber = GetLicenseNumber();
+
             System.Console.WriteLine();
             if (parkingLot.VehicleExists(licenseNumber))
             {
-                var toPay = parkingLot.ToPay(licenseNumber);
+                var endDate = DateTime.Now;
+                var toPay = parkingLot.ToPay(licenseNumber, endDate);
+                var parkingSpot = parkingLot.GetParkingSpotByLicenseNumber(licenseNumber);
+
+                System.Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+                System.Console.WriteLine("Start Date: " + parkingSpot.StartTime);
+                System.Console.Write("End Date: " + endDate);
                 System.Console.WriteLine($"Total payment: {toPay} lei");
+
                 System.Console.WriteLine("Press ENTER to pay...");
                 System.Console.ReadLine();
                 parkingLot.FreeParkingSpot(licenseNumber);
@@ -49,6 +58,7 @@ namespace Console
         private static bool MainMenu()
         {
             System.Console.Clear();
+            PrintWelcome();
             PrintStatus();
             System.Console.WriteLine();
             System.Console.WriteLine("Choose an option:");
@@ -85,7 +95,7 @@ namespace Console
                 case "0":
                     System.Console.Clear();
                     System.Console.WriteLine("You can go outside and play now!");
-                    System.Console.Beep(); //ToDo nu stiu daca merge ca nu mai am driver de sunet pe laptop asta lol
+                    System.Console.Beep(); // TODO TEST pe un laptop cu sunet să nu facă urât, pe ăsta nu am drivere
                     System.Threading.Thread.Sleep(3000);
                     return false;
                 default:
@@ -104,7 +114,7 @@ namespace Console
             {
                 var vehicle = new Vehicle {LicenseNumber = licenseNumber};
 
-                parkingLot.ParkVehicle(vehicle);
+                parkingLot.ParkVehicle(vehicle, DateTime.Now);
             }
             else
             {
@@ -113,6 +123,10 @@ namespace Console
             }
         }
 
+        private static void PrintWelcome()
+        {
+            System.Console.WriteLine(parkingLot.WelcomeMessage());
+        }
         private static void PrintStatus()
         {
             System.Console.Write(parkingLot.GetStatus());

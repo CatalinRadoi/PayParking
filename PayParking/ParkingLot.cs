@@ -67,7 +67,7 @@ namespace PayParking
                     sb.Append(parkingSpot.StartTime.ToString("dd-MM-yyyy HH:mm:ss"));
 
                     sb.Append("\t");
-                    sb.Append(this.ToPay(parkingSpot) + " lei");
+                    sb.Append(this.ToPay(parkingSpot, DateTime.Now) + " lei");
                 }
 
                 sb.Append(Environment.NewLine);
@@ -89,25 +89,47 @@ namespace PayParking
         }
 
 
-        public void ParkVehicle(Vehicle vehicle)
+        public ParkingSpot GetParkingSpotByLicenseNumber(string licenseNumber)
         {
+            return this.ParkingSpots.First(ps => ps.Vehicle != null && ps.Vehicle.LicenseNumber.Equals(licenseNumber,
+                                                     StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public string WelcomeMessage()
+        {
+            return $"Welcome to NU-STIU Parking | {this.FirstHourRate}lei first hour, then {this.HourlyRate}lei hourly.";
+
+        }
+
+        public void ParkVehicle(Vehicle vehicle, DateTime startTime)
+        {
+            if (this.ParkingSpots.Any(ps => ps.Vehicle != null && ps.Vehicle.LicenseNumber.Equals(vehicle.LicenseNumber,
+                                                StringComparison.InvariantCultureIgnoreCase)))
+            {
+                throw new ArgumentException("Vehicle with this license number already parked.");
+            }
+
             var spot = this.ParkingSpots.First(ps => ps.Vehicle == null);
             spot.Vehicle = vehicle;
-            spot.StartTime = DateTime.Now;
+            spot.StartTime = startTime;
         }
 
 
-        public double ToPay(ParkingSpot parkingSpot)
+        public double ToPay(ParkingSpot parkingSpot, DateTime endTime)
         {
-            var totalHours = (int) Math.Ceiling((DateTime.Now - parkingSpot.StartTime).TotalHours);
+            var totalHours = (int) Math.Ceiling((endTime- parkingSpot.StartTime).TotalHours);
 
             return this.FirstHourRate + (totalHours - 1) * this.HourlyRate;
         }
 
-        public double ToPay(string licenseNumber)
+        public double ToPay(string licenseNumber, DateTime endTime)
         {
             var spot = this.ParkingSpots.First(ps => ps.Vehicle.LicenseNumber.Equals(licenseNumber, StringComparison.InvariantCultureIgnoreCase));
-            return this.ToPay(spot);
+            if (endTime < spot.StartTime)
+            {
+                throw new OverflowException("EndDate less than StartDate");
+            }
+            return this.ToPay(spot, endTime);
         }
 
     
